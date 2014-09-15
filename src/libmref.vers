@@ -1,0 +1,7 @@
+GCRYPT_0.1 {
+  global:
+    mref_valid;
+
+  local:
+    *;
+};
