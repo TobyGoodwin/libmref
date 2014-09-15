@@ -6,8 +6,11 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_FILES([
 Makefile
 src/Makefile
+test/Makefile
 ])
 
 LT_INIT
 AM_INIT_AUTOMAKE
+AC_REQUIRE_AUX_FILE([tap-driver.sh])
+AC_PROG_AWK
 AC_OUTPUT
