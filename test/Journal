@@ -1,0 +1,6 @@
+2014-09-16
+==========
+
+mref_valid() is sortof ok, but what I really need is mref_parse(), that returns
+0 for success, and an error code otherwise. It could also update an array of 5
+ints passed in, to say where the commas in the input are.

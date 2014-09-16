@@ -2,11 +2,19 @@
 
 IFS='
 '
+valid=$srcdir/mrefs-valid
+nv=$(wc -l < $valid)
 invalid=$srcdir/mrefs-invalid
 ni=$(wc -l < $invalid)
-echo 1..$ni
+t=$(expr $nv + $ni)
+echo 1..$t
 
 n=1
+for i in $(cat $valid); do
+    ./check-valid $i || echo -n 'not '
+    echo ok $n
+    n=$(expr $n + 1)
+done
 for i in $(cat $invalid); do
     ./check-valid $i && echo -n 'not '
     echo ok $n
