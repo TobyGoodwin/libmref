@@ -6,5 +6,4 @@ LDADD = ../src/libmref.la $(DL_LIBS)
 
 AM_CPPFLAGS = -I$(top_srcdir)/src
 
-check_PROGRAMS = tester
-
+check_PROGRAMS = check-valid

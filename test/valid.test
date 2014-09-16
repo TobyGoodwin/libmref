@@ -1,4 +1,14 @@
 #! /bin/sh
-echo 1..1
-./tester x && echo -n 'not '
-echo 'ok 1'
+
+IFS='
+'
+invalid=$srcdir/mrefs-invalid
+ni=$(wc -l < $invalid)
+echo 1..$ni
+
+n=1
+for i in $(cat $invalid); do
+    ./check-valid $i && echo -n 'not '
+    echo ok $n
+    n=$(expr $n + 1)
+done
