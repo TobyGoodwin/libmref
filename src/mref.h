@@ -9,13 +9,13 @@ typedef unsigned char *mref;
 
 #define MREF_NUM_FIELDS 6
 
-typedef int mref_fields[MREF_NUM_FIELDS];
-typedef int mref_error;
+typedef int mref_field_t[MREF_NUM_FIELDS];
+typedef int mref_err_t;
 
-mref_error mref_parse(mref, mref_fields);
-mref_error mref_split(mref, mref_fields);
+mref_err_t mref_parse(mref, mref_field_t);
+mref_err_t mref_split(mref, mref_field_t);
 int mref_valid(mref);
 
-const char *mref_strerr(mref_error);
+const char *mref_strerr(mref_err_t);
 
 #endif

@@ -3,7 +3,7 @@
 
 #include "mref.h"
 
-int mref_parse(mref m, int *field) {
+mref_err_t mref_parse(mref m, mref_field_t field) {
     int i, p, q;
 
     if (!mref_split(m, field)) return 1;
@@ -54,6 +54,8 @@ int mref_parse(mref m, int *field) {
         gcry_md_write(ghd, m, field[4] - 1);
         memcpy(h, gcry_md_read(ghd, 0), 32);
         gcry_md_close(ghd);
+        /* probably better to decode the stated hash, and compare with the 32
+         * byte calculated hash */
         for (i = 0, j = 0; i < 30; i += 3) {
             h64[j++] = map[ h[i] >> 2 ];
             h64[j++] = map[ (h[i] & 3) << 4 | h[i+1] >> 4 ];

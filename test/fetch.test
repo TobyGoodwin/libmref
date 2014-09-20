@@ -1,0 +1,5 @@
+#! /bin/sh
+
+echo 1..1
+./check-fetch || echo -n 'not '
+echo ok 1

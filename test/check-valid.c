@@ -3,8 +3,8 @@
 #include <mref.h>
 
 int main(int argc, char **argv) {
-    mref_error r;
-    mref_fields field;
+    mref_err_t r;
+    mref_field_t field;
     if (argc != 2) return 99;
     r = mref_parse(argv[1], field);
     if (r == 0)
