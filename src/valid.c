@@ -1,5 +1,5 @@
 #include "mref.h"
 
-int mref_valid(mref m) {
-    return mref_parse(m, 0) == 0;
+int mref_valid(struct mref m) {
+    return mref_parse(m) == 0;
 }
