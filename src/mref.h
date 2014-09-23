@@ -13,9 +13,9 @@ struct mref {
 
 typedef int mref_err_t;
 
-mref_err_t mref_parse(struct mref);
-mref_err_t mref_split(struct mref);
-int mref_valid(struct mref);
+mref_err_t mref_parse(struct mref *);
+mref_err_t mref_split(struct mref *);
+int mref_valid(struct mref *);
 
 const char *mref_strerr(mref_err_t);
 

@@ -7,7 +7,7 @@ int main(int argc, char **argv) {
     struct mref m = { 0 };
     if (argc != 2) return 99;
     m.x = argv[1];
-    r = mref_parse(m);
+    r = mref_parse(&m);
     if (r == 0)
         return 0;
     fprintf(stderr, "mref_parse(%s) ==> %d\n", argv[1], r);
