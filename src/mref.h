@@ -5,6 +5,8 @@
 #ifndef _MREF_H
 #define _MREF_H
 
+#include <stdio.h>
+
 #define MREF_NUM_FIELDS 6
 struct mref {
     unsigned char *x;
@@ -16,6 +18,9 @@ typedef int mref_err_t;
 mref_err_t mref_parse(struct mref *);
 mref_err_t mref_split(struct mref *);
 int mref_valid(struct mref *);
+
+mref_err_t mref_fetch_filename(struct mref *, const char *n);
+mref_err_t mref_fetch_handle(struct mref *, FILE *h);
 
 const char *mref_strerr(mref_err_t);
 

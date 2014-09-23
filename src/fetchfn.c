@@ -3,7 +3,7 @@
 
 #include "mref.h"
 
-mref_err_t mref_fetch_filename(struct mref m, const char *n) {
+mref_err_t mref_fetch_filename(struct mref *m, const char *n) {
     FILE *h;
 
     h = fopen(n, "w");

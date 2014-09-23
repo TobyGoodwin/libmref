@@ -1,5 +1,13 @@
 #! /bin/sh
 
-echo 1..1
-./check-fetch || echo -n 'not '
-echo ok 1
+IFS='
+'
+valid=$srcdir/mrefs-valid
+nv=$(wc -l < $valid)
+echo 1..$nv
+n=1
+for i in $(cat $valid); do
+    ./check-fetch $i || echo -n 'not '
+    echo ok $n
+    n=$(expr $n + 1)
+done
