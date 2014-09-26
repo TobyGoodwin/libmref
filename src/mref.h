@@ -40,5 +40,6 @@ const char *mref_strerr(mref_err_t);
 #define MREF_ERR_NOT_FIELDS           2
 
 #define MREF_ERR_SYS (100+errno)
+#define MREF_ERR_TLS(x) (200+x)
 
 #endif
