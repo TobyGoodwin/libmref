@@ -10,8 +10,7 @@
     /*** from info gnutls ***/
 
 #define MAX_BUF 1024
-#define CAFILE "/etc/ssl/certs/ca-certificates.crt"
-#define MSG "GET / HTTP/1.0\r\n\r\n"
+#define CAFILE "/etc/pki/tls/certs/ca-bundle.crt"
 
 extern int tcp_connect(const char *);
 extern void tcp_close (int sd);
@@ -20,12 +19,12 @@ static int _verify_certificate_callback (gnutls_session_t session);
 /*** end info gnutls ***/
 
 mref_err_t mref_fetch_handle(struct mref *m, FILE *h) {
-    char *store;
+    char *mhsh, *rhsh, *store;
     gnutls_session_t sess;
     gnutls_anon_client_credentials_t cred;
     int fd = fileno(h);
     int err;
-    size_t store_len;
+    size_t mhsh_len, rhsh_len, store_len;
     fprintf(h, "foo!\n");
 
     if (!mref_split(m)) return MREF_ERR_NOT_FIELDS;
@@ -38,6 +37,24 @@ mref_err_t mref_fetch_handle(struct mref *m, FILE *h) {
     memcpy(store, m->x + m->field[MREF_FIELD_STORE_START], store_len);
     store[store_len - 1] = '\0';
     printf("store is: %s\n", store);
+
+    /* want this in an accessor function */
+    mhsh_len = m->field[MREF_FIELD_MESSAGE_HASH_END] -
+        m->field[MREF_FIELD_MESSAGE_HASH_START];
+    mhsh = malloc(mhsh_len);
+    if (!mhsh) return MREF_ERR_NOMEM;
+    memcpy(mhsh, m->x + m->field[MREF_FIELD_MESSAGE_HASH_START], mhsh_len);
+    mhsh[mhsh_len - 1] = '\0';
+    printf("mhsh is: %s\n", mhsh);
+
+    /* want this in an accessor function */
+    rhsh_len = m->field[MREF_FIELD_MREF_HASH_END] -
+        m->field[MREF_FIELD_MREF_HASH_START];
+    rhsh = malloc(rhsh_len);
+    if (!rhsh) return MREF_ERR_NOMEM;
+    memcpy(rhsh, m->x + m->field[MREF_FIELD_MREF_HASH_START], rhsh_len);
+    rhsh[rhsh_len - 1] = '\0';
+    printf("rhsh is: %s\n", rhsh);
 
     /*
     err = gnutls_global_init();
@@ -102,6 +119,10 @@ mref_err_t mref_fetch_handle(struct mref *m, FILE *h) {
   /* connect to the peer
    */
   sd = tcp_connect(store);
+  if (sd == -1) {
+      fprintf(stderr, "connect failed\n");
+      goto end;
+  }
 
   gnutls_transport_set_int (session, sd);
   gnutls_handshake_set_timeout (session, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
@@ -129,9 +150,13 @@ mref_err_t mref_fetch_handle(struct mref *m, FILE *h) {
       gnutls_free(desc);
     }
 
-  gnutls_record_send (session, MSG, strlen (MSG));
+  gnutls_record_send (session, rhsh, rhsh_len);
 
-  ret = gnutls_record_recv (session, buffer, MAX_BUF);
+  while ((ret = gnutls_record_recv (session, buffer, MAX_BUF)) > 0) {
+      for (ii = 0; ii < ret; ii++) {
+          fputc (buffer[ii], stdout);
+        }
+  }
   if (ret == 0)
     {
       printf ("- Peer has closed the TLS connection\n");
@@ -145,16 +170,6 @@ mref_err_t mref_fetch_handle(struct mref *m, FILE *h) {
     {
       fprintf (stderr, "*** Error: %s\n", gnutls_strerror (ret));
       goto end;
-    }
-
-  if (ret > 0)
-    {
-      printf ("- Received %d bytes: ", ret);
-      for (ii = 0; ii < ret; ii++)
-        {
-          fputc (buffer[ii], stdout);
-        }
-      fputs ("\n", stdout);
     }
 
   gnutls_bye (session, GNUTLS_SHUT_RDWR);
@@ -192,6 +207,8 @@ _verify_certificate_callback (gnutls_session_t session)
   int ret, type;
   const char *hostname;
   gnutls_datum_t out;
+
+return 0;
 
   /* read hostname */
   hostname = gnutls_session_get_ptr (session);
