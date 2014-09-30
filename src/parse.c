@@ -9,7 +9,7 @@ mref_err_t mref_parse(struct mref *m) {
     if (!mref_split(m)) return MREF_ERR_NOT_FIELDS;
 
     /* version number */
-    p = 0; q = m->field[MREF_FIELD_VERSION_END] - 1;
+    p = 0; q = m->fend[MREF_FIELD_VERSION];
     if (m->x[p] != '0') return 2;
 
     /* flags */
@@ -17,28 +17,29 @@ mref_err_t mref_parse(struct mref *m) {
         if (m->x[i] != 'L') return 3;
 
     /* sender - not much to say? */
-    p = m->field[0]; q = m->field[1] - 1;
+    p = m->fbeg[MREF_FIELD_SENDER]; q = m->fend[MREF_FIELD_SENDER];
     for (i = p; i < q; ++i)
         ;
 
     /* recipient */
-    p = m->field[1]; q = m->field[2] - 1;
+    p = m->fbeg[MREF_FIELD_RCPT]; q = m->fend[MREF_FIELD_RCPT];
     /* not empty */
     if (p - q == 0) return 4;
 
     /* store */
-    p = m->field[2]; q = m->field[3] - 1;
+    p = m->fbeg[MREF_FIELD_STORE]; q = m->fend[MREF_FIELD_STORE];
     /* not empty */
     if (q - p == 0) return 5;
 
     /* message hash */
-    p = m->field[3]; q = m->field[4] - 1;
+    p = m->fbeg[MREF_FIELD_MESSAGE_HASH];
+    q = m->fend[MREF_FIELD_MESSAGE_HASH];
 printf("p is %d, q is %d\n", p, q);
     /* b64 sha256 */
     if (q - p != 44) return 6;
 
     /* mref hash */
-    p = m->field[4]; q = m->field[5] - 1;
+    p = m->fbeg[MREF_FIELD_MREF_HASH]; q = m->fend[MREF_FIELD_MREF_HASH];
     /* not empty */
     if (q - p != 44) return 7;
 
@@ -52,7 +53,8 @@ printf("p is %d, q is %d\n", p, q);
         gcry_check_version(0);
         gerr = gcry_md_open(&ghd, GCRY_MD_SHA256, 0);
         if (!ghd) return 8;
-        gcry_md_write(ghd, m->x, m->field[4] - 1);
+        /* XXX doesn't work if there are spaces (easy to fix) */
+        gcry_md_write(ghd, m->x, m->fend[MREF_FIELD_MESSAGE_HASH]);
         memcpy(h, gcry_md_read(ghd, 0), 32);
         gcry_md_close(ghd);
         /* probably better to decode the stated hash, and compare with the 32

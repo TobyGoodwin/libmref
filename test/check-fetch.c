@@ -5,6 +5,7 @@
 int main(int argc, char **argv) {
     mref_err_t e;
 
+    printf("sizeof struct mref is %d\n", sizeof(struct mref));
     struct mref m = { 0 };
     if (argc != 2) return 99;
     m.x = argv[1];

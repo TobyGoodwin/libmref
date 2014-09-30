@@ -25,34 +25,31 @@ mref_err_t mref_fetch_handle(struct mref *m, FILE *h) {
     int fd = fileno(h);
     int err;
     size_t mhsh_len, rhsh_len, store_len;
-    fprintf(h, "foo!\n");
 
     if (!mref_split(m)) return MREF_ERR_NOT_FIELDS;
 
     /* want this in an accessor function */
-    store_len = m->field[MREF_FIELD_STORE_END] -
-        m->field[MREF_FIELD_STORE_START];
+    store_len = m->fend[MREF_FIELD_STORE] - m->fbeg[MREF_FIELD_STORE];
     store = malloc(store_len);
     if (!store) return MREF_ERR_NOMEM;
-    memcpy(store, m->x + m->field[MREF_FIELD_STORE_START], store_len);
+    memcpy(store, m->x + m->fbeg[MREF_FIELD_STORE], store_len);
     store[store_len - 1] = '\0';
     printf("store is: %s\n", store);
 
     /* want this in an accessor function */
-    mhsh_len = m->field[MREF_FIELD_MESSAGE_HASH_END] -
-        m->field[MREF_FIELD_MESSAGE_HASH_START];
+    mhsh_len = m->fend[MREF_FIELD_MESSAGE_HASH] -
+        m->fbeg[MREF_FIELD_MESSAGE_HASH];
     mhsh = malloc(mhsh_len);
     if (!mhsh) return MREF_ERR_NOMEM;
-    memcpy(mhsh, m->x + m->field[MREF_FIELD_MESSAGE_HASH_START], mhsh_len);
+    memcpy(mhsh, m->x + m->fbeg[MREF_FIELD_MESSAGE_HASH], mhsh_len);
     mhsh[mhsh_len - 1] = '\0';
     printf("mhsh is: %s\n", mhsh);
 
     /* want this in an accessor function */
-    rhsh_len = m->field[MREF_FIELD_MREF_HASH_END] -
-        m->field[MREF_FIELD_MREF_HASH_START];
+    rhsh_len = m->fend[MREF_FIELD_MREF_HASH] - m->fbeg[MREF_FIELD_MREF_HASH];
     rhsh = malloc(rhsh_len);
     if (!rhsh) return MREF_ERR_NOMEM;
-    memcpy(rhsh, m->x + m->field[MREF_FIELD_MREF_HASH_START], rhsh_len);
+    memcpy(rhsh, m->x + m->fbeg[MREF_FIELD_MREF_HASH], rhsh_len);
     rhsh[rhsh_len - 1] = '\0';
     printf("rhsh is: %s\n", rhsh);
 
@@ -153,8 +150,9 @@ mref_err_t mref_fetch_handle(struct mref *m, FILE *h) {
   gnutls_record_send (session, rhsh, rhsh_len);
 
   while ((ret = gnutls_record_recv (session, buffer, MAX_BUF)) > 0) {
+      /* somewhere around here, we need to do netstring processing */
       for (ii = 0; ii < ret; ii++) {
-          fputc (buffer[ii], stdout);
+          fputc(buffer[ii], h);
         }
   }
   if (ret == 0)
@@ -184,7 +182,6 @@ end:
 
   gnutls_global_deinit ();
 
-  return 0;
 }
 
 /*** end info gnutls ***/
