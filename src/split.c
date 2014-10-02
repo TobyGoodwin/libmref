@@ -8,9 +8,11 @@ mref_err_t mref_split(struct mref *m) {
     size_t l;
 
     if (!m->x) return 0;
-    l = strlen(m->x);
-    if (l > USHRT_MAX) return 0;
-    m->length = l;
+    if (m->length == 0) {
+        l = strlen(m->x);
+        if (l > USHRT_MAX) return 0;
+        m->length = l;
+    }
 
     /* find all 5 commas */
     c = 0;
@@ -25,7 +27,7 @@ mref_err_t mref_split(struct mref *m) {
             if (n >= m->length) return 0;
             m->fbeg[c] = n;
         }
-    if (c != MREF_NUM_FIELDS - 1) return 0;
+    if (c != MREF_NUM_FIELDS-1) return 0;
     m->fend[c] = m->length;
 
     return 1;

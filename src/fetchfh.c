@@ -28,29 +28,16 @@ mref_err_t mref_fetch_handle(struct mref *m, FILE *h) {
 
     if (!mref_split(m)) return MREF_ERR_NOT_FIELDS;
 
-    /* want this in an accessor function */
-    store_len = m->fend[MREF_FIELD_STORE] - m->fbeg[MREF_FIELD_STORE];
-    store = malloc(store_len);
+    store = mref_field_alloc(m, MREF_FLD_STORE);
     if (!store) return MREF_ERR_NOMEM;
-    memcpy(store, m->x + m->fbeg[MREF_FIELD_STORE], store_len);
-    store[store_len - 1] = '\0';
     printf("store is: %s\n", store);
 
-    /* want this in an accessor function */
-    mhsh_len = m->fend[MREF_FIELD_MESSAGE_HASH] -
-        m->fbeg[MREF_FIELD_MESSAGE_HASH];
-    mhsh = malloc(mhsh_len);
+    mhsh = mref_field_alloc(m, MREF_FLD_MESSAGE_HASH);
     if (!mhsh) return MREF_ERR_NOMEM;
-    memcpy(mhsh, m->x + m->fbeg[MREF_FIELD_MESSAGE_HASH], mhsh_len);
-    mhsh[mhsh_len - 1] = '\0';
     printf("mhsh is: %s\n", mhsh);
 
-    /* want this in an accessor function */
-    rhsh_len = m->fend[MREF_FIELD_MREF_HASH] - m->fbeg[MREF_FIELD_MREF_HASH];
-    rhsh = malloc(rhsh_len);
+    rhsh = mref_field_alloc(m, MREF_FLD_MREF_HASH);
     if (!rhsh) return MREF_ERR_NOMEM;
-    memcpy(rhsh, m->x + m->fbeg[MREF_FIELD_MREF_HASH], rhsh_len);
-    rhsh[rhsh_len - 1] = '\0';
     printf("rhsh is: %s\n", rhsh);
 
     /*

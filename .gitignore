@@ -1,5 +1,7 @@
+Makefile
+config.log
+config.status
 .deps/
-.gitignore.swp
 Makefile.in
 aclocal.m4
 autom4te.cache/

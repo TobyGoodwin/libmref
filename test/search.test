@@ -1,0 +1,21 @@
+#! /bin/sh
+
+IFS=
+valid=$srcdir/std11-valid
+nv=$(echo $valid/* | wc -w)
+invalid=$srcdir/std11-invalid
+ni=$(echo $invalid/* | wc -w)
+t=$(expr $nv + $ni)
+echo 1..$t
+
+n=1
+for i in $valid/*; do
+    ./check-search $(cat $i) || echo -n 'not '
+    echo ok $n
+    n=$(expr $n + 1)
+done
+for i in $invalid/*; do
+    ./check-search $(cat $i) && echo -n 'not '
+    echo ok $n
+    n=$(expr $n + 1)
+done
