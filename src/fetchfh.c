@@ -17,14 +17,17 @@ extern void tcp_close (int sd);
 static int _verify_certificate_callback (gnutls_session_t session);
 
 /*** end info gnutls ***/
+enum {
+    st_goodbad, st_count, st_data, st_comma, st_toomuch
+} state;
 
 mref_err_t mref_fetch_handle(struct mref *m, FILE *h) {
     char *mhsh, *rhsh, *store;
     gnutls_session_t sess;
     gnutls_anon_client_credentials_t cred;
     int fd = fileno(h);
-    int err;
-    size_t mhsh_len, rhsh_len, store_len;
+    int err, store_good;
+    size_t mhsh_len, ns_len, rhsh_len, store_len;
 
     if (!mref_split(m)) return MREF_ERR_NOT_FIELDS;
 
@@ -37,6 +40,7 @@ mref_err_t mref_fetch_handle(struct mref *m, FILE *h) {
     printf("mhsh is: %s\n", mhsh);
 
     rhsh = mref_field_alloc(m, MREF_FLD_MREF_HASH);
+    rhsh_len = mref_field_length(m, MREF_FLD_MREF_HASH);
     if (!rhsh) return MREF_ERR_NOMEM;
     printf("rhsh is: %s\n", rhsh);
 
@@ -52,7 +56,7 @@ mref_err_t mref_fetch_handle(struct mref *m, FILE *h) {
     /*** from info gnutls ***/
 
 {
-  int ret, sd, ii;
+  int ret, sd;
   gnutls_session_t session;
   char buffer[MAX_BUF + 1];
   const char *err;
@@ -135,13 +139,38 @@ mref_err_t mref_fetch_handle(struct mref *m, FILE *h) {
     }
 
   gnutls_record_send (session, rhsh, rhsh_len);
+fprintf(stderr, "sent rhsh, %d bytes\n", rhsh_len);
 
-  while ((ret = gnutls_record_recv (session, buffer, MAX_BUF)) > 0) {
-      /* somewhere around here, we need to do netstring processing */
-      for (ii = 0; ii < ret; ii++) {
-          fputc(buffer[ii], h);
+    state = st_goodbad;
+    ns_len = 0;
+
+    while ((ret = gnutls_record_recv (session, buffer, MAX_BUF)) > 0) {
+        int i;
+        for (i = 0; i < ret; ++i) {
+      
+            switch (state) {
+                case st_goodbad:
+                    store_good = buffer[i] == '+';
+                    ++state;
+                    break;
+                case st_count:
+                    if (buffer[i] >= '0' && buffer[i] <= '9')
+                        ns_len = ns_len * 10 + buffer[i] - '0';
+                    else if (buffer[i] == ':') ++state;
+                    else return MREF_ERR_STORE_PROTO;
+                    break;
+                case st_data:
+                    if (store_good) fputc(buffer[i], h);
+                    else fputc(buffer[i], stderr);
+                    if (--ns_len == 0) ++ state;
+                    break;
+                case st_comma:
+                    if (buffer[i] == ',') break;
+                case st_toomuch:
+                    return MREF_ERR_STORE_PROTO;
+            }
         }
-  }
+    }
   if (ret == 0)
     {
       printf ("- Peer has closed the TLS connection\n");

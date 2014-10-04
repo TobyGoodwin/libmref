@@ -24,7 +24,7 @@ mref_err_t mref_search(struct mref *m, void *x, size_t length) {
 
     end = length;
     for (i = start; i < length; ++i) {
-fprintf(stderr, "i is %d, length is %d, p[i] is %c\n", i, length, p[i]);
+//fprintf(stderr, "i is %d, length is %d, p[i] is %c\n", i, length, p[i]);
         if (i+1 < length && p[i] == '\n' &&
                 !( p[i+1] == ' ' || p[i+1] == '\t')) {
             end = i;
@@ -37,7 +37,7 @@ fprintf(stderr, "i is %d, length is %d, p[i] is %c\n", i, length, p[i]);
     }
     m->x = x + start;
     m->length = end - start;
-fprintf(stderr, "m->length %d, x[last] is %c\n", m->length, m->x[m->length-1]);
+//fprintf(stderr, "m->length %d, x[last] is %c\n", m->length, m->x[m->length-1]);
 
     return 0;
 }

@@ -5,6 +5,7 @@
 #ifndef _MREF_H
 #define _MREF_H
 
+#include <errno.h>
 #include <stdio.h>
 
 typedef unsigned short mref_offset;
@@ -30,9 +31,14 @@ mref_err_t mref_fetch_handle(struct mref *, FILE *);
 /* search an mref from a hunk of memory containing an RFC 5322 message */
 mref_err_t mref_search(struct mref *, void *, size_t);
 
+/* return a newly allocated, NUL-terminated copy of a field */
 char *mref_field_alloc(struct mref *, int);
+size_t mref_field_length(struct mref *, int);
 
 mref_err_t mref_read_handle_filename(FILE *, const char *);
+
+/* open file, search mref, download */
+mref_err_t mref_fetch(const char *);
 
 const char *mref_strerr(mref_err_t);
 
@@ -43,9 +49,10 @@ const char *mref_strerr(mref_err_t);
 #define MREF_FLD_MESSAGE_HASH   4
 #define MREF_FLD_MREF_HASH      5
 
-#define MREF_ERR_NOMEM                1
-#define MREF_ERR_NOT_FIELDS           2
-#define MREF_ERR_HDR_MISSING         23
+#define MREF_ERR_NOMEM                   1
+#define MREF_ERR_NOT_FIELDS              2
+#define MREF_ERR_HDR_MISSING            23
+#define MREF_ERR_STORE_PROTO            57
 
 #define MREF_ERR_SYS (100+errno)
 #define MREF_ERR_TLS(x) (200+x)

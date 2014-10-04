@@ -8,10 +8,10 @@ char *mref_field_alloc(struct mref *m, int f) {
     size_t l;
 
     if (f >= MREF_NUM_FIELDS) return 0;
-    l = m->fend[f] - m->fbeg[f] + 1;
-    x = malloc(l);
+    l = mref_field_length(m, f);
+    x = malloc(l + 1);
     if (!x) return 0;
     memcpy(x, m->x + m->fbeg[f], l);
-    x[l - 1] = '\0';
+    x[l] = '\0';
     return x;
 }

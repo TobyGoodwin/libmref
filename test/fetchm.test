@@ -7,7 +7,7 @@ nv=$(wc -l < $valid)
 echo 1..$nv
 n=1
 for i in $(cat $valid); do
-    ./check-fetch $i || echo -n 'not '
+    ./check-fetchm $i || echo -n 'not '
     echo ok $n
     n=$(expr $n + 1)
 done
