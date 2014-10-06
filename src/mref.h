@@ -24,9 +24,10 @@ mref_err_t mref_split(struct mref *);
 int mref_valid(struct mref *);
 
 /* fetch an mref's referent into a named file */
-mref_err_t mref_fetch_filename(struct mref *, const char *);
+mref_err_t mref_fetch_filename(struct mref *, const char *, const char *);
+
 /* fetch an mref's referent into an open file handle */
-mref_err_t mref_fetch_handle(struct mref *, FILE *);
+mref_err_t mref_fetch_handle(struct mref *, FILE *, const char *);
 
 /* search an mref from a hunk of memory containing an RFC 5322 message */
 mref_err_t mref_search(struct mref *, void *, size_t);
@@ -35,10 +36,14 @@ mref_err_t mref_search(struct mref *, void *, size_t);
 char *mref_field_alloc(struct mref *, int);
 size_t mref_field_length(struct mref *, int);
 
+/* headers */
+mref_err_t mref_delivery_headers(struct mref *, FILE *);
+mref_err_t mref_trace_headers(struct mref *, FILE *, int, const char *);
+
 mref_err_t mref_read_handle_filename(FILE *, const char *);
 
 /* open file, search mref, download */
-mref_err_t mref_fetch(const char *);
+mref_err_t mref_fetch(const char *, const char *);
 
 const char *mref_strerr(mref_err_t);
 

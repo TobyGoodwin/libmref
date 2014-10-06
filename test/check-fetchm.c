@@ -10,6 +10,6 @@ int main(int argc, char **argv) {
     if (argc != 2) return 99;
     m.x = argv[1];
     if (mref_parse(&m) != 0) return 1;
-    e = mref_fetch_filename(&m, "/tmp/t0");
+    e = mref_fetch_filename(&m, "/tmp/t0", "me");
     return e;
 }

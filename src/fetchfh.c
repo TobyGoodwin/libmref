@@ -21,7 +21,7 @@ enum {
     st_goodbad, st_count, st_data, st_comma, st_toomuch
 } state;
 
-mref_err_t mref_fetch_handle(struct mref *m, FILE *h) {
+mref_err_t mref_fetch_handle(struct mref *m, FILE *h, const char *me) {
     char *mhsh, *rhsh, *store;
     gnutls_session_t sess;
     gnutls_anon_client_credentials_t cred;
@@ -140,6 +140,8 @@ mref_err_t mref_fetch_handle(struct mref *m, FILE *h) {
 
   gnutls_record_send (session, rhsh, rhsh_len);
 fprintf(stderr, "sent rhsh, %d bytes\n", rhsh_len);
+
+    mref_trace_headers(m, h, sd, me);
 
     state = st_goodbad;
     ns_len = 0;

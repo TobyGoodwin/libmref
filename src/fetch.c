@@ -7,7 +7,7 @@
 
 #include "mref.h"
 
-mref_err_t mref_fetch(const char *f0) {
+mref_err_t mref_fetch(const char *f0, const char *me) {
     char *addr, *f1;
     FILE *fh1;
     int fd0, fd1, r;
@@ -46,7 +46,10 @@ mref_err_t mref_fetch(const char *f0) {
     fh1 = fdopen(fd1, "w");
     if (!fh1) return MREF_ERR_SYS;
 
-    r = mref_fetch_handle(&m, fh1);
+    r = mref_delivery_headers(&m, fh1);
+    if (r != 0) return r;
+
+    r = mref_fetch_handle(&m, fh1, me);
     if (r != 0) return r;
 
     r = rename(f1, f0);
