@@ -6,4 +6,4 @@ LDADD = ../src/libmref.la $(DL_LIBS) $(LIBGCRYPT_LIBS) $(LIBGNUTLS_LIBS)
 
 AM_CPPFLAGS = -I$(top_srcdir)/src $(LIBGCRYPT_CFLAGS) $(LIBGNUTLS_CFLAGS)
 
-check_PROGRAMS = check-fetch check-fetchm check-search check-valid
+check_PROGRAMS = check-fetchm check-search check-valid mref-fetch

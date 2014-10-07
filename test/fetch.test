@@ -1,0 +1,15 @@
+#! /bin/sh
+
+IFS=
+valid=$srcdir/std11-valid
+nv=$(echo $valid/* | wc -w)
+echo 1..$nv
+
+n=1
+for i in $valid/*; do
+    x=$(mktemp)
+    cp $i $x
+    ./mref-fetch $x || echo -n 'not '
+    echo ok $n
+    n=$(expr $n + 1)
+done
