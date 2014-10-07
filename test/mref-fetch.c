@@ -3,11 +3,17 @@
 #include "mref.h"
 
 int main(int argc, char **argv) {
-    mref_err_t e;
+    mref_err_t e, ee;
+    int i;
 
-    if (argc != 2) return 99;
-    printf("fetching %s\n", argv[1]);
-    e = mref_fetch(argv[1], "me");
-    if (e != 0) printf("mref_fetch returned %d\n", e);
-    return e;
+    ee = 0;
+    for (i = 1; i < argc; ++i) {
+        printf("fetching %s\n", argv[i]);
+        e = mref_fetch(argv[i], "me");
+        if (e != 0) {
+            printf("mref_fetch returned %d\n", e);
+            ee = e;
+        }
+    }
+    return ee;
 }
