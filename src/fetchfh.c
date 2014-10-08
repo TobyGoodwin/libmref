@@ -33,16 +33,16 @@ mref_err_t mref_fetch_handle(struct mref *m, FILE *h, const char *me) {
 
     store = mref_field_alloc(m, MREF_FLD_STORE);
     if (!store) return MREF_ERR_NOMEM;
-    printf("store is: %s\n", store);
+//printf("store is: %s\n", store);
 
     mhsh = mref_field_alloc(m, MREF_FLD_MESSAGE_HASH);
     if (!mhsh) return MREF_ERR_NOMEM;
-    printf("mhsh is: %s\n", mhsh);
+//printf("mhsh is: %s\n", mhsh);
 
     rhsh = mref_field_alloc(m, MREF_FLD_MREF_HASH);
     rhsh_len = mref_field_length(m, MREF_FLD_MREF_HASH);
     if (!rhsh) return MREF_ERR_NOMEM;
-    printf("rhsh is: %s\n", rhsh);
+//printf("rhsh is: %s\n", rhsh);
 
     /*
     err = gnutls_global_init();
@@ -131,15 +131,17 @@ mref_err_t mref_fetch_handle(struct mref *m, FILE *h, const char *me) {
     }
   else
     {
+#if 0
       char* desc;
 
       desc = gnutls_session_get_desc(session);
       printf ("- Session info: %s\n", desc);
       gnutls_free(desc);
+#endif
     }
 
   gnutls_record_send (session, rhsh, rhsh_len);
-fprintf(stderr, "sent rhsh, %d bytes\n", rhsh_len);
+//fprintf(stderr, "sent rhsh, %d bytes\n", rhsh_len);
 
     mref_trace_headers(m, h, sd, me);
 

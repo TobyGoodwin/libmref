@@ -36,7 +36,7 @@ int tcp_connect(const char *server) {
   hints.ai_next = 0;
 
   err = getaddrinfo(server, port, &hints, &addr);
-  printf("err is %d\n", err);
+//printf("err is %d\n", err);
   if (err != 0) {
       printf("err string => %s\n", gai_strerror(err));
       exit(1);

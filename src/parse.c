@@ -34,13 +34,13 @@ mref_err_t mref_parse(struct mref *m) {
     /* message hash */
     p = m->fbeg[MREF_FLD_MESSAGE_HASH];
     q = m->fend[MREF_FLD_MESSAGE_HASH];
-printf("p is %d, q is %d\n", p, q);
+//printf("p is %d, q is %d\n", p, q);
     /* b64 sha256 */
     if (q - p != 44) return 6;
 
     /* mref hash */
     p = m->fbeg[MREF_FLD_MREF_HASH]; q = m->fend[MREF_FLD_MREF_HASH];
-printf("p is %d, q is %d\n", p, q);
+//printf("p is %d, q is %d\n", p, q);
     /* not empty */
     if (q - p != 44) return 7;
 
@@ -71,7 +71,7 @@ printf("p is %d, q is %d\n", p, q);
         h64[j++] = map[ (h[i+1] & 0xf) << 2 ];
         h64[j++] = '=';
         h64[j++] = '\0';
-        printf("hash is %s\n", h64);
+//printf("hash is %s\n", h64);
         if (memcmp(m->x + p, h64, 44) != 0) return 9;
     }
 
