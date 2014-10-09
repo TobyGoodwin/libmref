@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <gcrypt.h>
 #include <gnutls/gnutls.h>
 
 #include "mref.h"
@@ -26,7 +27,9 @@ mref_err_t mref_fetch_handle(struct mref *m, FILE *h, const char *me) {
     gnutls_session_t sess;
     gnutls_anon_client_credentials_t cred;
     int fd = fileno(h);
-    int err, store_good;
+    int err, i, store_good;
+    unsigned char h_mref[32], h_calc[32];
+    gcry_md_hd_t ghd;
     size_t mhsh_len, ns_len, rhsh_len, store_len;
 
     if (!mref_split(m)) return MREF_ERR_NOT_FIELDS;
@@ -37,6 +40,7 @@ mref_err_t mref_fetch_handle(struct mref *m, FILE *h, const char *me) {
 
     mhsh = mref_field_alloc(m, MREF_FLD_MESSAGE_HASH);
     if (!mhsh) return MREF_ERR_NOMEM;
+    _mref_b64dec(h_mref, mhsh, mref_field_length(m, MREF_FLD_MESSAGE_HASH));
 //printf("mhsh is: %s\n", mhsh);
 
     rhsh = mref_field_alloc(m, MREF_FLD_MREF_HASH);
@@ -147,6 +151,8 @@ mref_err_t mref_fetch_handle(struct mref *m, FILE *h, const char *me) {
 
     state = st_goodbad;
     ns_len = 0;
+    gcry_md_open(&ghd, GCRY_MD_SHA256, 0);
+    if (!ghd) return MREF_ERR_GCRYPT;
 
     while ((ret = gnutls_record_recv (session, buffer, MAX_BUF)) > 0) {
         int i;
@@ -166,6 +172,7 @@ mref_err_t mref_fetch_handle(struct mref *m, FILE *h, const char *me) {
                 case st_data:
                     if (store_good) fputc(buffer[i], h);
                     else fputc(buffer[i], stderr);
+                    gcry_md_write(ghd, buffer + i, 1);
                     if (--ns_len == 0) ++ state;
                     break;
                 case st_comma:
@@ -198,10 +205,16 @@ end:
 
   gnutls_deinit (session);
 
+  memcpy(h_calc, gcry_md_read(ghd, 0), 32);
+  gcry_md_close(ghd);
+
   gnutls_certificate_free_credentials (xcred);
 
   gnutls_global_deinit ();
 
+  if (memcmp(h_mref, h_calc, 32) != 0) return MREF_ERR_BAD_MSG_HASH;
+
+  return 0;
 }
 
 /*** end info gnutls ***/
@@ -210,6 +223,7 @@ end:
     if (fflush(h) != 0) return MREF_ERR_SYS;
     if (fsync(fd) != 0) return MREF_ERR_SYS;
     fclose(h); /* cannot fail */
+
     return 0;
 }
 

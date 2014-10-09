@@ -47,6 +47,8 @@ mref_err_t mref_fetch(const char *, const char *);
 
 const char *mref_strerr(mref_err_t);
 
+void _mref_b64dec(unsigned char *, unsigned char *, size_t);
+
 #define MREF_FLD_VERSION        0
 #define MREF_FLD_SENDER         1
 #define MREF_FLD_RCPT           2
@@ -54,10 +56,12 @@ const char *mref_strerr(mref_err_t);
 #define MREF_FLD_MESSAGE_HASH   4
 #define MREF_FLD_MREF_HASH      5
 
-#define MREF_ERR_NOMEM                   1
-#define MREF_ERR_NOT_FIELDS              2
-#define MREF_ERR_HDR_MISSING            23
-#define MREF_ERR_STORE_PROTO            57
+#define MREF_ERR_BAD_MSG_HASH            1
+#define MREF_ERR_GCRYPT                  2
+#define MREF_ERR_HDR_MISSING             3
+#define MREF_ERR_NOMEM                   4
+#define MREF_ERR_NOT_FIELDS              5
+#define MREF_ERR_STORE_PROTO             6
 
 #define MREF_ERR_SYS (100+errno)
 #define MREF_ERR_TLS(x) (200+x)
