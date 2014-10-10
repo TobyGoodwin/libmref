@@ -6,6 +6,8 @@ int main(int argc, char **argv) {
     mref_err_t e, ee;
     int i;
 
+    e = mref_init();
+    if (e != 0) return e;
     ee = 0;
     for (i = 1; i < argc; ++i) {
 //printf("fetching %s\n", argv[i]);
@@ -15,5 +17,6 @@ int main(int argc, char **argv) {
             ee = e;
         }
     }
+    mref_finish();
     return ee;
 }

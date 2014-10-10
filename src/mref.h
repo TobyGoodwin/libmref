@@ -8,6 +8,8 @@
 #include <errno.h>
 #include <stdio.h>
 
+#include <gnutls/gnutls.h>
+
 typedef unsigned short mref_offset;
 #define MREF_NUM_FIELDS 6
 struct mref {
@@ -18,6 +20,10 @@ struct mref {
 };
 
 typedef int mref_err_t;
+
+mref_err_t mref_init(void);
+gnutls_certificate_credentials_t mref_cred(void);
+void mref_finish(void);
 
 mref_err_t mref_parse(struct mref *);
 mref_err_t mref_split(struct mref *);

@@ -11,7 +11,6 @@
     /*** from info gnutls ***/
 
 #define MAX_BUF 1024
-#define CAFILE "/etc/pki/tls/certs/ca-bundle.crt"
 
 extern int tcp_connect(const char *);
 extern void tcp_close (int sd);
@@ -64,24 +63,6 @@ mref_err_t mref_fetch_handle(struct mref *m, FILE *h, const char *me) {
   gnutls_session_t session;
   char buffer[MAX_BUF + 1];
   const char *err;
-  gnutls_certificate_credentials_t xcred;
-
-  gnutls_global_init ();
-
-  /* X509 stuff */
-  gnutls_certificate_allocate_credentials (&xcred);
-
-  /* sets the trusted cas file
-   */
-  gnutls_certificate_set_x509_trust_file (xcred, CAFILE, GNUTLS_X509_FMT_PEM);
-  gnutls_certificate_set_verify_function (xcred, _verify_certificate_callback);
-
-  /* If client holds a certificate it can be set using the following:
-   *
-     gnutls_certificate_set_x509_key_file (xcred,
-                                           "cert.pem", "key.pem",
-                                           GNUTLS_X509_FMT_PEM);
-   */
 
   /* Initialize TLS session
    */
@@ -104,9 +85,7 @@ mref_err_t mref_fetch_handle(struct mref *m, FILE *h, const char *me) {
 
   /* put the x509 credentials to the current session
    */
-  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
-
-  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
+  gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, mref_cred());
 
   /* connect to the peer
    */
@@ -208,10 +187,6 @@ end:
   memcpy(h_calc, gcry_md_read(ghd, 0), 32);
   gcry_md_close(ghd);
 
-  gnutls_certificate_free_credentials (xcred);
-
-  gnutls_global_deinit ();
-
   if (memcmp(h_mref, h_calc, 32) != 0) return MREF_ERR_BAD_MSG_HASH;
 
   return 0;
@@ -226,55 +201,3 @@ end:
 
     return 0;
 }
-
-/*** start info gnutls ***/
-/* This function will verify the peer's certificate, and check
- * if the hostname matches, as well as the activation, expiration dates.
- */
-static int
-_verify_certificate_callback (gnutls_session_t session)
-{
-  unsigned int status;
-  int ret, type;
-  const char *hostname;
-  gnutls_datum_t out;
-
-return 0;
-
-  /* read hostname */
-  hostname = gnutls_session_get_ptr (session);
-  /* read hostname */
-  hostname = gnutls_session_get_ptr (session);
-
-  /* This verification function uses the trusted CAs in the credentials
-   * structure. So you must have installed one or more CA certificates.
-   */
-  ret = gnutls_certificate_verify_peers3 (session, hostname, &status);
-  if (ret < 0)
-    {
-      printf ("Error\n");
-      return GNUTLS_E_CERTIFICATE_ERROR;
-    }
-
-  type = gnutls_certificate_type_get (session);
-
-  ret = gnutls_certificate_verification_status_print( status, type, &out, 0);
-  if (ret < 0)
-    {
-      printf ("Error\n");
-      return GNUTLS_E_CERTIFICATE_ERROR;
-    }
-
-  printf ("%s", out.data);
-
-  gnutls_free(out.data);
-
-  if (status != 0) /* Certificate is not trusted */
-      return GNUTLS_E_CERTIFICATE_ERROR;
-
-  /* notify gnutls to continue handshake normally */
-  return 0;
-}
-
-
-    /*** end info gnutls ***/

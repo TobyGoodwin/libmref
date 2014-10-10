@@ -9,7 +9,10 @@ int main(int argc, char **argv) {
     struct mref m = { 0 };
     if (argc != 2) return 99;
     m.x = argv[1];
+    e = mref_init();
+    if (e != 0) return e;
     if (mref_parse(&m) != 0) return 1;
     e = mref_fetch_filename(&m, "/tmp/t0", "me");
+    mref_finish();
     return e;
 }
