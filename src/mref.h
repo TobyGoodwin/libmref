@@ -68,6 +68,7 @@ void _mref_b64dec(unsigned char *, unsigned char *, size_t);
 #define MREF_ERR_NOMEM                   4
 #define MREF_ERR_NOT_FIELDS              5
 #define MREF_ERR_STORE_PROTO             6
+#define MREF_ERR_CONNECT_FAIL            7
 
 #define MREF_ERR_SYS (100+errno)
 #define MREF_ERR_TLS(x) (200+x)
